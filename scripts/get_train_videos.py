@@ -8,8 +8,8 @@ videos = sorted([
     if v.endswith(".mp4")
 ])
 
-first_40 = videos[:40]
+first_5 = videos[:5]
 
 print("Selected TRAIN videos:")
-for v in first_40:
+for v in first_5:
     print(v)

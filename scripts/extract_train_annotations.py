@@ -1,39 +1,63 @@
-import gzip
 import os
+import gzip
+import pickle
 
-# -------- PATHS --------
-ANNO_FILE = r"C:\Users\Gunajothi\OneDrive\Desktop\Pheonix\annotations\phoenix14t.pami0.train.annotations_only.gzip"
-TRAIN_VIDEO_DIR = r"C:\Users\Gunajothi\OneDrive\Desktop\Pheonix\dataset\train"
-OUT_FILE = "train_selected_annotations.txt"
-# ----------------------
+# --------------------------------------------------
+# PATHS (FIX THIS PATH)
+# --------------------------------------------------
+TRAIN_VIDEO_DIR = "../dataset/train"
+ANNOTATION_FILE = "../annotations/phoenix14t.pami0.train.annotations_only.gzip"
+OUTPUT_FILE = "train_selected_annotations.txt"
 
-# Step 1: collect selected video names
-selected_videos = sorted([
-    v.replace(".mp4", "")
-    for v in os.listdir(TRAIN_VIDEO_DIR)
-    if v.endswith(".mp4")
-])[:40]
+# --------------------------------------------------
+# 0. Check annotation file EXISTS FIRST
+# --------------------------------------------------
+if not os.path.exists(ANNOTATION_FILE):
+    raise FileNotFoundError(f"❌ Annotation file not found: {ANNOTATION_FILE}")
 
-selected_set = set(selected_videos)
+# --------------------------------------------------
+# 1. Get DEV video order
+# --------------------------------------------------
+selected_order = sorted([
+    f.replace(".mp4", "")
+    for f in os.listdir(TRAIN_VIDEO_DIR)
+    if f.endswith(".mp4")
+])
 
-print("Filtering annotations for:")
-for v in selected_videos:
+print("Selected TRAIN videos:")
+for v in selected_order:
     print(" ", v)
 
-print("\nExtracted annotations:\n")
+# --------------------------------------------------
+# 2. Load annotation file
+# --------------------------------------------------
+with gzip.open(ANNOTATION_FILE, "rb") as f:
+    data = pickle.load(f)
 
-count = 0
+# --------------------------------------------------
+# 3. Build lookup dictionary
+# --------------------------------------------------
+anno_dict = {}
+for sample in data:
+    vid = sample["name"].replace("train/", "")
+    anno_dict[vid] = sample
 
-with gzip.open(ANNO_FILE, "rt", encoding="utf-8", errors="ignore") as f, \
-     open(OUT_FILE, "w", encoding="utf-8") as out:
+# --------------------------------------------------
+# 4. Write annotations in VIDEO ORDER
+# --------------------------------------------------
+found = 0
+with open(OUTPUT_FILE, "w", encoding="utf-8") as out:
+    for vid in selected_order:
+        if vid in anno_dict:
+            s = anno_dict[vid]
+            out.write(f"{vid}\n")
+            out.write(f"GLOSS: {s['gloss']}\n")
+            out.write(f"TEXT: {s['text']}\n")
+            out.write(f"SIGNER: {s['signer']}\n\n")
+            print("✔ Found:", vid)
+            found += 1
+        else:
+            print("✘ Missing:", vid)
 
-    for block in f.read().split("u}"):
-        for vid in selected_set:
-            if f"train/{vid}" in block:
-                out.write(block + "\n\n")
-                print("✔ Found:", vid)
-                count += 1
-                break
-
-print(f"\nTotal matched annotations: {count}")
-print(f"Saved to: {OUT_FILE}")
+print(f"\nTotal matched annotations: {found}")
+print("Saved to:", OUTPUT_FILE)

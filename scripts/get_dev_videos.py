@@ -8,8 +8,8 @@ videos = sorted([
     if v.endswith(".mp4")
 ])
 
-first_10 = videos[:10]
+first_5 = videos[:5]
 
 print("Selected DEV videos:")
-for v in first_10:
+for v in first_5:
     print(v)

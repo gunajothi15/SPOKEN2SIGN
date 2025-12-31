@@ -9,8 +9,8 @@ videos = sorted([
 ])
 
 
-first_10 = videos[:10]
+first_5 = videos[:5]
 
 print("Selected TEST videos:")
-for v in first_10:
+for v in first_5:
     print(v)
