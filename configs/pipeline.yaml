@@ -1,0 +1,42 @@
+experiment:
+  name: spoken2sign_skels
+  description: >
+    Config-driven preprocessing pipeline.
+    Converts sign language videos into .skels files.
+    One .skels file per video.
+
+paths:
+  dataset_root: ./dataset
+  keypoints_root: ./keypoints
+  skels_root: ./skels
+
+splits:
+  train:
+    video_dir: train
+    json_dir: train
+    output_dir: train
+
+  dev:
+    video_dir: dev
+    json_dir: dev
+    output_dir: dev
+
+  test:
+    video_dir: test
+    json_dir: test
+    output_dir: test
+
+preprocessing:
+  num_joints: 50
+  features_per_joint: 3
+  flatten_order: [x, y, confidence]
+  normalize_xy: true
+  confidence_as_z: true
+
+openpose:
+  enabled: false   # already extracted
+  model: BODY_25_HANDS
+
+runtime:
+  seed: 42
+  verbose: true

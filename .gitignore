@@ -1,0 +1,13 @@
+# data
+skels/
+keypoints/
+outputs/
+dataset/
+
+# environment
+venv/
+__pycache__/
+
+# mac
+.DS_Store
+
